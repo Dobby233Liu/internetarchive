@@ -1115,7 +1115,7 @@ class Item(BaseItem):
                         response = self.session.send(prepared_request,
                                                      stream=True,
                                                      **request_kwargs)
-                    except RequestException as e:
+                    except requests.exceptions.RequestException as e:
                         if retries <= 0:
                             raise e
                         log.info(f'failed upload ({retries} times left)')
