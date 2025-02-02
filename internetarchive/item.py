@@ -39,7 +39,7 @@ from urllib.parse import quote
 from xml.parsers.expat import ExpatError
 
 from requests import Request, Response
-from requests.exceptions import HTTPError
+from requests.exceptions import RequestException, HTTPError
 from tqdm import tqdm
 
 from internetarchive import catalog
@@ -1115,7 +1115,7 @@ class Item(BaseItem):
                         response = self.session.send(prepared_request,
                                                      stream=True,
                                                      **request_kwargs)
-                    except requests.exceptions.RequestException as e:
+                    except RequestException as e:
                         if retries <= 0:
                             raise e
                         log.info(f'failed upload ({retries} times left)')
