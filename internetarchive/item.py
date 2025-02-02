@@ -1111,9 +1111,18 @@ class Item(BaseItem):
                     if prepared_request.headers.get('transfer-encoding') == 'chunked':
                         del prepared_request.headers['transfer-encoding']
 
-                    response = self.session.send(prepared_request,
-                                                 stream=True,
-                                                 **request_kwargs)
+                    try:
+                        response = self.session.send(prepared_request,
+                                                     stream=True,
+                                                     **request_kwargs)
+                    except RequestException as e:
+                        if retries <= 0:
+                            raise e
+                        log.info(f'failed upload ({retries} times left)')
+                        sleep(retries_sleep)
+                        retries -= 1
+                        first_try = False
+                        continue
                     if (response.status_code == 503) and (retries > 0):
                         if b'appears to be spam' in response.content:
                             log.info('detected as spam, upload failed')
